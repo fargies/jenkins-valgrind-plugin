@@ -1,4 +1,4 @@
 <div>
-  This plug-in scans for open tasks in a specified set of files in the project modules
+  This plug-in collects memory leaks reports
   and visualizes the results.
 </div>

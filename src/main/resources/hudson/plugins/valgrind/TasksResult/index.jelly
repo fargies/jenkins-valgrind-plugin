@@ -1,0 +1,48 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler"
+  xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
+  xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:result="/result">
+  <l:layout norefresh="true">
+    <st:include it="${it.owner}" page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1>${%Memory Leaks}</h1>
+
+      <h2>${%Memory Leaks Trend}</h2>
+
+      <table class="pane" id="summary">
+        <tr>
+          <td class="pane-header">${%All Memory Leaks}</td>
+          <td class="pane-header">${%New Memory Leaks}</td>
+          <td class="pane-header">${%Fixed Memory Leaks}</td>
+        </tr>
+        <tbody>
+          <tr>
+            <td class="pane">
+              ${it.numberOfAnnotations}
+            </td>
+            <td class="pane">
+              <j:if test="${it.numberOfNewLeaks == 0}">
+                0
+              </j:if>
+              <j:if test="${it.numberOfNewLeaks != 0}">
+                <a href="new">${it.numberOfNewLeaks}</a>
+              </j:if>
+            </td>
+            <td class="pane">
+              <j:if test="${it.numberOfFixedLeaks == 0}">
+                0
+              </j:if>
+              <j:if test="${it.numberOfFixedLeaks != 0}">
+                <a href="fixed">${it.numberOfFixedLeaks}</a>
+              </j:if>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <result:priorities-summary />
+
+      <result:main />
+
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

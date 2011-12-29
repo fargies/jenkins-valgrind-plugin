@@ -1,0 +1,32 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+  xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+  xmlns:i="jelly:fmt" xmlns:local="local">
+  <st:header name="Content-Type" value="text/html;charset=UTF-8" />
+  <j:forEach var="file" items="${annotations.files}">
+    <table class="pane">
+      <tr class="pane">
+        <td class="pane-header">
+          <p>${%File}: ${file.shortName}</p>
+        </td>
+      </tr>
+      <j:forEach var="leak" items="${file.annotations}">
+        <tr>
+          <td class="pane">
+            <p>
+              <j:choose>
+                <j:when test="${it.isCurrent() and leak.canDisplayFile(it.owner)}">
+                  <a href="source.${leak.key}/#${leak.primaryLineNumber}">${%leaks.line(leak.primaryLineNumber)}:</a>
+                </j:when>
+                <j:otherwise>
+                  ${%leaks.line(leak.primaryLineNumber)}:
+                </j:otherwise>
+              </j:choose>
+              ${leak.match}
+            </p>
+          </td>
+        </tr>
+      </j:forEach>
+    </table>
+    <p/>
+  </j:forEach>
+</j:jelly>

@@ -1,0 +1,8 @@
+<j:jelly xmlns:j="jelly:core">
+
+  <dt>$${LEAKS_RESULT}</dt>
+  <dd>
+    Expands to the build result of the Valgrind plug-in.
+  </dd>
+
+</j:jelly>

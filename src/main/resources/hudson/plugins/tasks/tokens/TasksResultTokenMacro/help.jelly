@@ -1,8 +1,0 @@
-<j:jelly xmlns:j="jelly:core">
-
-  <dt>$${TASKS_RESULT}</dt>
-  <dd>
-    Expands to the build result of the Task Scanner plug-in.
-  </dd>
-
-</j:jelly>

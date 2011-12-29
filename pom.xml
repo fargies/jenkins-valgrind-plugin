@@ -8,13 +8,13 @@
     <relativePath>../analysis-pom/pom.xml</relativePath>
   </parent>
 
-  <artifactId>tasks</artifactId>
+  <artifactId>valgrind</artifactId>
   <packaging>hpi</packaging>
-  <name>Task Scanner Plug-in</name>
+  <name>Valgrind analysis Plug-in</name>
   <version>4.26-SNAPSHOT</version>
   <url>http://wiki.jenkins-ci.org/x/XoAs</url>
-  <description>This plug-in scans the workspace files for open tasks
-    and generates a trend report.</description>
+  <description>This plug-in reads Valgrind analysis from a log file and
+  generates a trend report.</description>
 
   <licenses>
     <license>
