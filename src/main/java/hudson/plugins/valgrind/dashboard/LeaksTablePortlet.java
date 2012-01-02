@@ -36,7 +36,7 @@ public class LeaksTablePortlet extends AbstractWarningsTablePortlet {
     /** {@inheritDoc} */
     @Override
     protected String getPluginName() {
-        return "tasks";
+        return "valgrind";
     }
 
     /**

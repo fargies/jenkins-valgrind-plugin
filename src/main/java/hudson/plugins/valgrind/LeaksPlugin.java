@@ -14,6 +14,5 @@ public class LeaksPlugin extends Plugin {
     public void start() {
         LeaksDetailBuilder detailBuilder = new LeaksDetailBuilder();
         DetailFactory.addDetailBuilder(LeaksResultAction.class, detailBuilder);
-        DetailFactory.addDetailBuilder(LeaksMavenResultAction.class, detailBuilder);
     }
 }

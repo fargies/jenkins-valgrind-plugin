@@ -7,8 +7,7 @@ import hudson.matrix.MatrixBuild;
 import hudson.model.BuildListener;
 import hudson.plugins.analysis.core.AnnotationsAggregator;
 import hudson.plugins.analysis.core.HealthDescriptor;
-import hudson.plugins.analysis.util.model.Priority;
-import hudson.plugins.valgrind.parser.LeaksParserResult;
+import hudson.plugins.analysis.core.ParserResult;
 
 import java.io.IOException;
 
@@ -22,16 +21,16 @@ import org.apache.commons.lang.StringUtils;
  */
 
 public class LeaksAnnotationsAggregator extends MatrixAggregator {
-    private final LeaksParserResult totals = new LeaksParserResult();
+    private final ParserResult totals = new ParserResult();
     private final HealthDescriptor healthDescriptor;
     private final String defaultEncoding;
 
     /** Tag identifiers indicating high priority. */
-    private String highTags = StringUtils.EMPTY;
+    private final String highTags = StringUtils.EMPTY;
     /** Tag identifiers indicating normal priority. */
-    private String normalTags = StringUtils.EMPTY;
+    private final String normalTags = StringUtils.EMPTY;
     /** Tag identifiers indicating low priority. */
-    private String lowTags = StringUtils.EMPTY;
+    private final String lowTags = StringUtils.EMPTY;
 
     /**
      * Creates a new instance of {@link AnnotationsAggregator}.
@@ -63,10 +62,6 @@ public class LeaksAnnotationsAggregator extends MatrixAggregator {
             if (action != null) {
                 LeaksResult result = action.getResult();
                 totals.addAnnotations(result.getAnnotations());
-                totals.addScannedFiles(result.getNumberOfFiles());
-                highTags = result.getTags(Priority.HIGH);
-                normalTags = result.getTags(Priority.NORMAL);
-                lowTags = result.getTags(Priority.LOW);
             }
         }
         return true;
@@ -75,8 +70,7 @@ public class LeaksAnnotationsAggregator extends MatrixAggregator {
     /** {@inheritDoc} */
     @Override
     public boolean endBuild() throws InterruptedException, IOException {
-        LeaksResult result = new LeaksResult(build, defaultEncoding, totals,
-                highTags, normalTags, lowTags);
+        LeaksResult result = new LeaksResult(build, defaultEncoding, totals);
 
         build.addAction(new LeaksResultAction(build, healthDescriptor, result));
 

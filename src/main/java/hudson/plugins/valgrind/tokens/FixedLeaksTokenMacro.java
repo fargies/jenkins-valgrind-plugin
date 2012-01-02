@@ -2,7 +2,6 @@ package hudson.plugins.valgrind.tokens;
 
 import hudson.Extension;
 import hudson.plugins.analysis.tokens.AbstractFixedAnnotationsTokenMacro;
-import hudson.plugins.valgrind.LeaksMavenResultAction;
 import hudson.plugins.valgrind.LeaksResultAction;
 
 /**
@@ -17,7 +16,7 @@ public class FixedLeaksTokenMacro extends AbstractFixedAnnotationsTokenMacro {
      */
     @SuppressWarnings("unchecked")
     public FixedLeaksTokenMacro() {
-        super("LEAKS_FIXED", LeaksResultAction.class, LeaksMavenResultAction.class);
+        super("LEAKS_FIXED", LeaksResultAction.class);
     }
 }
 

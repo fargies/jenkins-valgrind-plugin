@@ -1,0 +1,92 @@
+
+STACK = element stack {
+    element frame {
+        ## ip is an HEX64 value (0x...)
+        element ip { text }
+        element obj { text }?
+        element fn { text }?
+        element dir { text }?
+        element file { text }?
+        element line { text }?
+    }+
+}
+
+ORIGIN = element origin {
+    element what { text }
+    STACK
+}
+
+ERROR = element error {
+    ## unique is an HEX64 value (0x...)
+    element unique { text }
+    element tid { xsd:int }
+    element kind {
+          "InvalidFree"
+        | "MismatchedFree"
+        | "InvalidRead"
+        | "InvalidWrite"
+        | "InvalidJump"
+        | "Overlap"
+        | "InvalidMemPool"
+        | "UninitCondition"
+        | "UninitValue"
+        | "SyscallParam"
+        | "ClientCheck"
+        | "Leak_DefinitelyLost"
+        | "Leak_IndirectlyLost"
+        | "Leak_PossiblyLost"
+        | "Leak_StillReachable"
+    }
+    element what { text }
+    element leakedbytes { xsd:int }?
+    element leakedblocks { xsd:int }?
+    STACK
+    element auxwhat { text }
+    STACK
+    ORIGIN
+}
+
+ERRORCOUNTS = element errorcounts {
+    element pair {
+        element count { xsd:int }
+        ## unique is an HEX64 value (0x...)
+        element unique { text }
+    }*
+}
+
+SUPPCOUNTS = element suppcounts {
+    element pair {
+        element count { xsd:int }
+        element name { text }
+    }*
+}
+
+STATUS = element status {
+    element state { text }
+    element time { text }
+}
+
+element valgrindoutput {
+    ## this schema describes version 2, see docs/internals/xml-output.txt in Valgrind's sources for details on protocol V3
+    element protocolversion { xsd:integer }
+    element preamble { element line { text }* }*
+    element pid { xsd:int }
+    element ppid { xsd:int }
+    element tool { text }
+    element logfilequalifier { element var { text }, element value { text } }?
+    element usercomment { text }?
+    element args {
+        element vargv {
+            element exe { text }
+            element arg { text }*
+        }
+        element argv {
+            element exe { text }
+            element arg { text }*
+        }
+    }
+    STATUS
+    ( ERROR | ERRORCOUNTS )*
+    STATUS
+}
+

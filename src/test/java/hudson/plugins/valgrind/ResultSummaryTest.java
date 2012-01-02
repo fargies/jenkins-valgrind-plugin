@@ -2,8 +2,6 @@ package hudson.plugins.valgrind;
 
 import static org.mockito.Mockito.*;
 import hudson.plugins.analysis.test.AbstractEnglishLocaleTest;
-import hudson.plugins.valgrind.ResultSummary;
-import hudson.plugins.valgrind.LeaksResult;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -13,51 +11,43 @@ import org.junit.Test;
  */
 public class ResultSummaryTest extends AbstractEnglishLocaleTest {
     /**
-     * Checks the text for no open tasks in 1 file. The delta is > 0.
+     * Checks the text for no leaks. The delta is > 0.
      */
     @Test
-    public void test0WarningsIn1FileAndPositiveDelta() {
-        checkSummaryText(0, 1, 10, "Leak Scanner: 0 open tasks in 1 workspace file.");
+    public void test0LeaksAndPositiveDelta() {
+        checkSummaryText(0, 1, 10, "Memory Leaks: 0 memory leaks");
     }
 
     /**
-     * Checks the text for no open tasks in 1 file. The delta is < 0.
+     * Checks the text for no leaks. The delta is < 0.
      */
     @Test
-    public void test0WarningsIn1FileAndNegativeDelta() {
-        checkSummaryText(0, 1, -5, "Leak Scanner: 0 open tasks in 1 workspace file.");
+    public void test0LeaksAndNegativeDelta() {
+        checkSummaryText(0, 1, -5, "Memory Leaks: 0 memory leaks");
     }
 
     /**
-     * Checks the text for no open tasks in 1 file. The delta is 0.
+     * Checks the text for no leaks. The delta is 0.
      */
     @Test
-    public void test0WarningsIn1File() {
-        checkSummaryText(0, 1, 0, "Leak Scanner: 0 open tasks in 1 workspace file.");
+    public void test0Leaks() {
+        checkSummaryText(0, 1, 0, "Memory Leaks: 0 memory leaks");
     }
 
     /**
-     * Checks the text for no open tasks in 1 file. The delta is 0.
+     * Checks the text for 1 leak. The delta is 0.
      */
     @Test
-    public void test0WarningsIn5Files() {
-        checkSummaryText(0, 5, 0, "Leak Scanner: 0 open tasks in 5 workspace files.");
+    public void test1Leak() {
+        checkSummaryText(1, 2, 0, "Memory Leaks: <a href=\"leaksResult\">1 memory leak</a>");
     }
 
     /**
-     * Checks the text for no open tasks in 1 file. The delta is 0.
+     * Checks the text for 5 leaks. The delta is 0.
      */
     @Test
-    public void test1WarningIn2Files() {
-        checkSummaryText(1, 2, 0, "Leak Scanner: <a href=\"tasksResult\">1 open task</a> in 2 workspace files.");
-    }
-
-    /**
-     * Checks the text for no open tasks in 1 file. The delta is 0.
-     */
-    @Test
-    public void test5WarningsIn1File() {
-        checkSummaryText(5, 1, 0, "Leak Scanner: <a href=\"tasksResult\">5 open tasks</a> in 1 workspace file.");
+    public void test5Leaks() {
+        checkSummaryText(5, 1, 0, "Memory Leaks: <a href=\"leaksResult\">5 memory leaks</a>");
     }
 
     /**
@@ -76,7 +66,6 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
     private void checkSummaryText(final int numberOfWarnings, final int numberOfFiles, final int delta, final String expectedMessage) {
         LeaksResult result = mock(LeaksResult.class);
         when(result.getNumberOfAnnotations()).thenReturn(numberOfWarnings);
-        when(result.getNumberOfFiles()).thenReturn(numberOfFiles);
         when(result.getDelta()).thenReturn(delta);
 
         Assert.assertEquals("Wrong summary message created.", expectedMessage, ResultSummary.createSummary(result));
@@ -90,75 +79,75 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
     }
 
     /**
-     * Checks the delta message for 1 new and no closed tasks.
+     * Checks the delta message for 1 new and no closed leak.
      */
     @Test
     public void testOnly1New() {
-        checkDeltaText(0, 1, "<li><a href=\"tasksResult/new\">1 new open task</a></li>");
+        checkDeltaText(0, 1, "<li><a href=\"leaksResult/new\">1 new memory leak</a></li>");
     }
 
     /**
-     * Checks the delta message for 5 new and no closed tasks.
+     * Checks the delta message for 5 new and no closed leaks.
      */
     @Test
     public void testOnly5New() {
-        checkDeltaText(0, 5, "<li><a href=\"tasksResult/new\">5 new open tasks</a></li>");
+        checkDeltaText(0, 5, "<li><a href=\"leaksResult/new\">5 new memory leaks</a></li>");
     }
 
     /**
-     * Checks the delta message for 1 fixed and no new open tasks.
+     * Checks the delta message for 1 fixed and no new open leaks.
      */
     @Test
     public void testOnly1Fixed() {
-        checkDeltaText(1, 0, "<li><a href=\"tasksResult/fixed\">1 closed task</a></li>");
+        checkDeltaText(1, 0, "<li><a href=\"leaksResult/fixed\">1 fixed leak</a></li>");
     }
 
     /**
-     * Checks the delta message for 5 fixed and no new open tasks.
+     * Checks the delta message for 5 fixed and no new open leaks.
      */
     @Test
     public void testOnly5Fixed() {
-        checkDeltaText(5, 0, "<li><a href=\"tasksResult/fixed\">5 closed tasks</a></li>");
+        checkDeltaText(5, 0, "<li><a href=\"leaksResult/fixed\">5 fixed leaks</a></li>");
     }
 
     /**
-     * Checks the delta message for 5 fixed and 5 new open tasks.
+     * Checks the delta message for 5 fixed and 5 new open leaks.
      */
     @Test
     public void test5New5Fixed() {
         checkDeltaText(5, 5,
-                "<li><a href=\"tasksResult/new\">5 new open tasks</a></li>"
-                + "<li><a href=\"tasksResult/fixed\">5 closed tasks</a></li>");
+                "<li><a href=\"leaksResult/new\">5 new memory leaks</a></li>"
+                + "<li><a href=\"leaksResult/fixed\">5 fixed leaks</a></li>");
     }
 
     /**
-     * Checks the delta message for 5 fixed and 5 new open tasks.
+     * Checks the delta message for 5 fixed and 5 new open leaks.
      */
     @Test
     public void test5New1Fixed() {
         checkDeltaText(1, 5,
-        "<li><a href=\"tasksResult/new\">5 new open tasks</a></li>"
-        + "<li><a href=\"tasksResult/fixed\">1 closed task</a></li>");
+        "<li><a href=\"leaksResult/new\">5 new memory leaks</a></li>"
+        + "<li><a href=\"leaksResult/fixed\">1 fixed leak</a></li>");
     }
 
     /**
-     * Checks the delta message for 5 fixed and 5 new open tasks.
+     * Checks the delta message for 5 fixed and 5 new open leaks.
      */
     @Test
     public void test1New5Fixed() {
         checkDeltaText(5, 1,
-                "<li><a href=\"tasksResult/new\">1 new open task</a></li>"
-                + "<li><a href=\"tasksResult/fixed\">5 closed tasks</a></li>");
+                "<li><a href=\"leaksResult/new\">1 new memory leak</a></li>"
+                + "<li><a href=\"leaksResult/fixed\">5 fixed leaks</a></li>");
     }
 
     /**
-     * Checks the delta message for 5 fixed and 5 new open tasks.
+     * Checks the delta message for 5 fixed and 5 new open leaks.
      */
     @Test
     public void test1New1Fixed() {
         checkDeltaText(1, 1,
-                "<li><a href=\"tasksResult/new\">1 new open task</a></li>"
-                + "<li><a href=\"tasksResult/fixed\">1 closed task</a></li>");
+                "<li><a href=\"leaksResult/new\">1 new memory leak</a></li>"
+                + "<li><a href=\"leaksResult/fixed\">1 fixed leak</a></li>");
     }
 
     /**

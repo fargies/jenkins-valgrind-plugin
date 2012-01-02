@@ -1,8 +1,18 @@
 package hudson.plugins.valgrind.parser;
 
-import hudson.plugins.analysis.util.model.AbstractAnnotation;
+import hudson.model.AbstractBuild;
+import hudson.plugins.analysis.util.model.FileAnnotation;
+import hudson.plugins.analysis.util.model.LineRange;
 import hudson.plugins.analysis.util.model.Priority;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Formatter;
+import java.util.LinkedList;
+import java.util.ListIterator;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -10,62 +20,272 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author Ulli Hafner
  */
-public class Leak extends AbstractAnnotation {
+public class Leak implements FileAnnotation, Serializable {
     /** Unique identifier of this class. */
     private static final long serialVersionUID = 5171662552905752370L;
+    /** Current key of this annotation. */
+    private static long currentKey;
+    /** Temporary directory holding the workspace files. */
+    public static final String WORKSPACE_FILES = "workspace-files";
+
+    /** unique identifier */
+    private final String message;
+    private final Priority priority;
+    private final LeakType type;
+    private final LinkedList<Frame> frame;
+    private final long key;
+    /**
+     * Context hash code of this annotation. This hash code is used to decide if
+     * two annotations are equal even if the equals method returns <code>false</code>.
+     */
+    private long contextHashCode;
+
     /** Origin of the annotation. */
     public static final String ORIGIN = "valgrind";
 
+    /** text used for external files (the topFrame is in an external library) */
+    public static final String EXTERNAL_MODULE = "external";
+
     /**
-     * Creates a new instance of <code>Leak</code>.
-     *
-     * @param priority
-     *            the priority
-     * @param lineNumber
-     *            the line number of the task in the corresponding file
-     * @param taskTag
-     *            the found task tag
+     * Creates a new instance of {@link Leak}.
      * @param message
-     *            the message of the task (the text after the task keyword)
+     *            the associated message.
+     * @param type
+     *            the message type.
+     * @param frame
+     *            the associated stackframe.
      */
-    public Leak(final Priority priority, final int lineNumber, final String taskTag, final String message) {
-        super(priority, message, lineNumber, lineNumber, StringUtils.EMPTY, taskTag);
-
-        setOrigin(ORIGIN);
-    }
-
-    /**
-     * Returns the detail message of the task (the text after the task keyword).
-     *
-     * @return the detail message of the task
-     */
-    public String getDetailMessage() {
-        return super.getMessage();
+    public Leak(final String message, final LeakType type, final LinkedList<Frame> frame) {
+        this.message = message;
+        this.type = type;
+        this.frame = frame;
+        priority = Priority.NORMAL;
+        contextHashCode = key = currentKey++;
     }
 
     /** {@inheritDoc} */
+    public int compareTo(final FileAnnotation o) {
+        int result;
+
+        result = getMessage().compareTo(o.getMessage());
+        if (result != 0) {
+            return result;
+        }
+        result = getType().compareTo(o.getType());
+        if (result != 0) {
+            return result;
+        }
+
+        return hashCode() - o.hashCode(); // fallback
+    }
+
     @Override
-    public String getMessage() {
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Leak other = (Leak)obj;
+        if (message != other.message) {
+            return false;
+        }
+
+        if (type != other.type) {
+            return false;
+        }
+
+        if (getFirstFrame() != other.getFirstFrame()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /** {@inheritDoc} */
+    public int getPrimaryLineNumber() {
+        Frame f = getFirstFrame();
+
+        if (f != null) {
+            return f.getLine();
+        }
+        else {
+            return -1;
+        }
+    }
+
+    private Frame getFirstFrame() {
+        if (frame == null || frame.isEmpty()) {
+            return null;
+        }
+        else if (type == LeakType.Leak_DefinitelyLost ||
+                type == LeakType.Leak_IndirectlyLost ||
+                type == LeakType.Leak_PossiblyLost ||
+                type == LeakType.Leak_StillReachable)
+        {
+            return frame.getLast();
+        }
+        else {
+            return frame.getFirst();
+        }
+    }
+
+    /** {@inheritDoc} */
+    public Collection<LineRange> getLineRanges() {
+        ArrayList<LineRange> range = new ArrayList<LineRange>();
+        range.add(new LineRange(getPrimaryLineNumber()));
+
+        return range;
+    }
+
+    /** {@inheritDoc} */
+    public long getKey() {
+        return key;
+    }
+
+    /** {@inheritDoc} */
+    public Priority getPriority() {
+        return priority;
+    }
+
+    /** {@inheritDoc} */
+    public String getFileName() {
+        Frame f = getFirstFrame();
+
+        if (f != null && f.getFile() != null && f.getDir() != null) {
+            return f.getDir() + "/" + f.getFile();
+        }
+        else {
+            return EXTERNAL_MODULE;
+        }
+    }
+
+    /** {@inheritDoc} */
+    public String getLinkName() {
+        return getFileName();
+    }
+
+    /** {@inheritDoc} */
+    public String getTempName(final AbstractBuild<?, ?> owner) {
+        String fileName = getFileName();
+        if (fileName != null) {
+            return owner.getRootDir().getAbsolutePath()
+                    + "/" + WORKSPACE_FILES
+                    + "/" + Integer.toHexString(fileName.hashCode()) + ".tmp";
+        }
         return StringUtils.EMPTY;
     }
 
     /** {@inheritDoc} */
-    public String getToolTip() {
-        return getPriority().getLongLocalizedString();
+    public void setFileName(final String fileName) {
     }
 
-    /**
-     * Gets the matching text of a tasks including the tag.
-     *
-     * @return the match
-     */
-    public String getMatch() {
-        if (StringUtils.isEmpty(getType())) {
-            return getDetailMessage();
+    /** {@inheritDoc} */
+    public void setPathName(final String workspacePath) {
+    }
+
+    /** {@inheritDoc} */
+    public boolean canDisplayFile(final AbstractBuild<?, ?> owner) {
+        Frame f = getFirstFrame();
+
+        return (f != null && f.getFile() != null);
+    }
+
+    /** {@inheritDoc} */
+    public String getShortFileName() {
+        Frame f = getFirstFrame();
+
+        if (f != null) {
+            return FilenameUtils.getName(f.getFile());
         }
         else {
-            return getType() + ": " + getDetailMessage();
+            return
+                    EXTERNAL_MODULE;
         }
     }
+
+    /** {@inheritDoc} */
+    public String getModuleName() {
+        return "Default Module";
+    }
+
+    /** {@inheritDoc} */
+    public void setModuleName(final String moduleName) {
+    }
+
+    /** {@inheritDoc} */
+    public String getPackageName() {
+        return "Default Package";
+    }
+
+    /** {@inheritDoc} */
+    public boolean hasPackageName() {
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    public String getPathName() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public String getOrigin() {
+        return ORIGIN;
+    }
+
+    /** {@inheritDoc} */
+    public String getCategory() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public String getType() {
+        return type.toString();
+    }
+
+    /** {@inheritDoc} */
+    public long getContextHashCode() {
+        return contextHashCode;
+    }
+
+    /** {@inheritDoc} */
+    public void setContextHashCode(final long contextHashCode) {
+        this.contextHashCode = contextHashCode;
+    }
+
+    /** {@inheritDoc} */
+    public String getMessage() {
+        return message;
+    }
+    private void dumpStack(final LinkedList<Frame> frame, final StringBuilder sb) {
+        ListIterator<Frame> it = frame.listIterator(frame.size());
+
+        Frame topFrame = it.previous();
+        Formatter form = new Formatter(sb);
+        form.format("&nbsp;at %s: %s (%s:%d)<br/>",
+                topFrame.getIp(), topFrame.getFn(),
+                topFrame.getFile(), topFrame.getLine());
+
+        while (it.hasPrevious()) {
+            topFrame = it.previous();
+
+            form.format("&nbsp;by %s: %s (%s:%d)<br/>",
+                    topFrame.getIp(), topFrame.getFn(),
+                    topFrame.getFile(), topFrame.getLine());
+        }
+    }
+
+    /** {@inheritDoc} */
+    public String getToolTip() {
+        StringBuilder tooltip = new StringBuilder();
+        tooltip.append(message + "<br/>");
+        dumpStack(frame, tooltip);
+        return tooltip.toString();
+    }
+
 }
 

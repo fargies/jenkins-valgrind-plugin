@@ -2,7 +2,6 @@ package hudson.plugins.valgrind.tokens;
 
 import hudson.Extension;
 import hudson.plugins.analysis.tokens.AbstractNewAnnotationsTokenMacro;
-import hudson.plugins.valgrind.LeaksMavenResultAction;
 import hudson.plugins.valgrind.LeaksResultAction;
 
 /**
@@ -17,7 +16,7 @@ public class NewLeaksTokenMacro extends AbstractNewAnnotationsTokenMacro {
      */
     @SuppressWarnings("unchecked")
     public NewLeaksTokenMacro() {
-        super("LEAKS_NEW", LeaksResultAction.class, LeaksMavenResultAction.class);
+        super("LEAKS_NEW", LeaksResultAction.class);
     }
 }
 

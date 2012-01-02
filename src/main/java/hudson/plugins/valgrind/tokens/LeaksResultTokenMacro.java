@@ -2,7 +2,6 @@ package hudson.plugins.valgrind.tokens;
 
 import hudson.Extension;
 import hudson.plugins.analysis.tokens.AbstractResultTokenMacro;
-import hudson.plugins.valgrind.LeaksMavenResultAction;
 import hudson.plugins.valgrind.LeaksResultAction;
 
 /**
@@ -17,7 +16,7 @@ public class LeaksResultTokenMacro extends AbstractResultTokenMacro {
      */
     @SuppressWarnings("unchecked")
     public LeaksResultTokenMacro() {
-        super("LEAKS_RESULT", LeaksResultAction.class, LeaksMavenResultAction.class);
+        super("LEAKS_RESULT", LeaksResultAction.class);
     }
 }
 

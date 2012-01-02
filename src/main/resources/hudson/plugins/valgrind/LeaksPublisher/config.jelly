@@ -1,4 +1,11 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
       xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:u="/util" xmlns:c="/hudson/plugins/valgrind/config">
+ 
+  <f:entry title="${%Valgrind XML file path}" description="" field="file" >
+    <f:textbox />
+  </f:entry>
 
+  <f:advanced>
+    <u:advanced id=""/>
+  </f:advanced>
 </j:jelly>

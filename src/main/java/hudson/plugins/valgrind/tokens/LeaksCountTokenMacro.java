@@ -2,7 +2,6 @@ package hudson.plugins.valgrind.tokens;
 
 import hudson.Extension;
 import hudson.plugins.analysis.tokens.AbstractAnnotationsCountTokenMacro;
-import hudson.plugins.valgrind.LeaksMavenResultAction;
 import hudson.plugins.valgrind.LeaksResultAction;
 
 /**
@@ -17,7 +16,7 @@ public class LeaksCountTokenMacro extends AbstractAnnotationsCountTokenMacro {
      */
     @SuppressWarnings("unchecked")
     public LeaksCountTokenMacro() {
-        super("LEAKS_COUNT", LeaksResultAction.class, LeaksMavenResultAction.class);
+        super("LEAKS_COUNT", LeaksResultAction.class);
     }
 }
 

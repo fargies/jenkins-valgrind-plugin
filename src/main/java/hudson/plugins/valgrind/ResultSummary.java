@@ -22,7 +22,7 @@ public final class ResultSummary {
         summary.append(Messages.Valgrind_ResultAction_Summary());
         summary.append(" ");
         if (tasks > 0) {
-            summary.append("<a href=\"tasksResult\">");
+            summary.append("<a href=\"leaksResult\">");
         }
         if (tasks == 1) {
             summary.append(Messages.Valgrind_ResultAction_OneLeak());
@@ -48,7 +48,7 @@ public final class ResultSummary {
     public static String createDeltaMessage(final LeaksResult result) {
         StringBuilder summary = new StringBuilder();
         if (result.getNumberOfNewWarnings() > 0) {
-            summary.append("<li><a href=\"tasksResult/new\">");
+            summary.append("<li><a href=\"leaksResult/new\">");
             if (result.getNumberOfNewWarnings() == 1) {
                 summary.append(Messages.Valgrind_ResultAction_OneNewLeak());
             }

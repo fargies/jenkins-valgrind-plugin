@@ -1,5 +1,6 @@
 package hudson.plugins.valgrind;
 
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.matrix.MatrixAggregator;
 import hudson.matrix.MatrixBuild;
@@ -9,13 +10,14 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.plugins.analysis.core.BuildResult;
 import hudson.plugins.analysis.core.HealthAwarePublisher;
+import hudson.plugins.analysis.core.ParserResult;
 import hudson.plugins.analysis.util.PluginLogger;
-import hudson.plugins.valgrind.parser.LeaksParserResult;
-import hudson.plugins.valgrind.parser.WorkspaceScanner;
+import hudson.plugins.valgrind.parser.LeakParser;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -27,28 +29,15 @@ public class LeaksPublisher extends HealthAwarePublisher {
     /** Unique ID of this class. */
     private static final long serialVersionUID = 3787892530045641806L;
 
-    /** Default files pattern. */
-    private static final String DEFAULT_PATTERN = "**/*.java";
-    /** Tag identifiers indicating high priority. */
-    private final String high;
-    /** Tag identifiers indicating normal priority. */
-    private final String normal;
-    /** Tag identifiers indicating low priority. */
-    private final String low;
-    /** Tag identifiers indicating case sensitivity. */
-    private final boolean ignoreCase;
-    /** Ant file-set pattern of files to work with. */
-    private final String pattern;
-    /** Ant file-set pattern of files to exclude from work. */
-    private final String excludePattern;
+    public static final ValgrindReportFilenameFilter VALGRIND_FILENAME_FILTER = new ValgrindReportFilenameFilter();
+    /** Ant reportFiles-set pattern of files to work with. */
+    private final String reportFiles;
 
     /**
      * Creates a new instance of <code>LeaksPublisher</code>.
      *
-     * @param pattern
-     *            Ant file-set pattern of files to scan for open tasks in
-     * @param excludePattern
-     *            Ant file-set pattern of files to exclude from scan
+     * @param reportFiles
+     *            The Valgrind output reportFiles to parse
      * @param healthy
      *            Report health as 100% when the number of open tasks is less
      *            than this value
@@ -98,16 +87,6 @@ public class LeaksPublisher extends HealthAwarePublisher {
      *            determines whether the plug-in can run for failed builds, too
      * @param shouldDetectModules
      *            determines whether module names should be derived from Maven POM or Ant build files
-     * @param high
-     *            tag identifiers indicating high priority
-     * @param normal
-     *            tag identifiers indicating normal priority
-     * @param low
-     *            tag identifiers indicating low priority
-     * @param ignoreCase
-     *            if case should be ignored during matching
-     * @param defaultEncoding
-     *            the default encoding to be used when reading and parsing files
      */
     // CHECKSTYLE:OFF
     @SuppressWarnings("PMD.ExcessiveParameterList")
@@ -119,75 +98,24 @@ public class LeaksPublisher extends HealthAwarePublisher {
             final String failedTotalAll, final String failedTotalHigh, final String failedTotalNormal, final String failedTotalLow,
             final String failedNewAll, final String failedNewHigh, final String failedNewNormal, final String failedNewLow,
             final boolean canRunOnFailed, final boolean shouldDetectModules, final boolean canComputeNew,
-            final String high, final String normal, final String low, final boolean ignoreCase,
-            final String pattern, final String excludePattern) {
+            final String file) {
         super(healthy, unHealthy, thresholdLimit, defaultEncoding, useDeltaValues,
                 unstableTotalAll, unstableTotalHigh, unstableTotalNormal, unstableTotalLow,
                 unstableNewAll, unstableNewHigh, unstableNewNormal, unstableNewLow,
                 failedTotalAll, failedTotalHigh, failedTotalNormal, failedTotalLow,
                 failedNewAll, failedNewHigh, failedNewNormal, failedNewLow,
-                canRunOnFailed, shouldDetectModules, canComputeNew, "TASKS");
-        this.pattern = pattern;
-        this.excludePattern = excludePattern;
-        this.high = high;
-        this.normal = normal;
-        this.low = low;
-        this.ignoreCase = ignoreCase;
+                canRunOnFailed, shouldDetectModules, canComputeNew, "LEAKS");
+        reportFiles = file;
     }
     // CHECKSTYLE:ON
 
     /**
-     * Returns the Ant file-set pattern of files to work with.
+     * Returns the Valgrind XML reportFiles to work with.
      *
-     * @return Ant file-set pattern of files to work with
+     * @return Valgrind XML reportFiles to work with
      */
-    public String getPattern() {
-        return pattern;
-    }
-
-     /**
-     * Returns the Ant file-set pattern of files to exclude from work.
-     *
-     * @return Ant file-set pattern of files to exclude from work
-     */
-    public String getExcludePattern() {
-        return excludePattern;
-    }
-
-    /**
-     * Returns the high priority task identifiers.
-     *
-     * @return the high priority task identifiers
-     */
-    public String getHigh() {
-        return high;
-    }
-
-    /**
-     * Returns the normal priority task identifiers.
-     *
-     * @return the normal priority task identifiers
-     */
-    public String getNormal() {
-        return normal;
-    }
-
-    /**
-     * Returns the low priority task identifiers.
-     *
-     * @return the low priority task identifiers
-     */
-    public String getLow() {
-        return low;
-    }
-
-    /**
-     * Returns whether case should be ignored during the scanning.
-     *
-     * @return <code>true</code> if case should be ignored during the scanning
-     */
-    public boolean getIgnoreCase() {
-        return ignoreCase;
+    public String getFile() {
+        return reportFiles;
     }
 
     /** {@inheritDoc} */
@@ -199,18 +127,43 @@ public class LeaksPublisher extends HealthAwarePublisher {
     /** {@inheritDoc} */
     @Override
     protected BuildResult perform(final AbstractBuild<?, ?> build, final PluginLogger logger) throws InterruptedException, IOException {
-        LeaksParserResult project;
-        WorkspaceScanner scanner = new WorkspaceScanner(StringUtils.defaultIfEmpty(getPattern(), DEFAULT_PATTERN),
-                getExcludePattern(), getDefaultEncoding(), high, normal, low, ignoreCase, shouldDetectModules());
-        project = build.getWorkspace().act(scanner);
+        logger.log("Publishing Valgrind report...");
+        final FilePath[] moduleRoots = build.getModuleRoots();
+        final FilePath root =
+                (moduleRoots != null && moduleRoots.length > 1) ?
+                        build.getWorkspace() : build.getModuleRoot();
+        ParserResult project = new ParserResult();
+
+        FilePath[] reports = new FilePath[0];
+
+        // throws IOExceptions on error
+        reports = root.list(reportFiles);
+
+        if (reports.length == 0) {
+            logger.log("No Valgrind XML report reportFiles were found using the pattern '" +
+                    reportFiles + "' relative to '" + root.getRemote() + "'.");
+            throw new IOException("Error: no Valgrind XML report reportFiles found.");
+        }
+
+        LeakParser parser = new LeakParser();
+        for (int i = 0; i < reports.length; ++i) {
+            parser.parse(reports[i].read(), project);
+        }
 
         logger.logLines(project.getLogMessages());
-        logger.log(String.format("Found %d open tasks.", project.getNumberOfAnnotations()));
+        logger.log(String.format("Found %d memory leaks.", project.getNumberOfAnnotations()));
 
-        LeaksResult result = new LeaksResult(build, getDefaultEncoding(), project, high, normal, low);
+        LeaksResult result = new LeaksResult(build, getDefaultEncoding(), project);
         build.getActions().add(new LeaksResultAction(build, this, result));
 
         return result;
+    }
+
+    /**
+     * Gets the stored valgrind report files for the given build.
+     */
+    static File[] getValgrindReports(final AbstractBuild<?,?> build) {
+        return build.getRootDir().listFiles(VALGRIND_FILENAME_FILTER);
     }
 
     /** {@inheritDoc} */
@@ -224,4 +177,12 @@ public class LeaksPublisher extends HealthAwarePublisher {
             final BuildListener listener) {
         return new LeaksAnnotationsAggregator(build, launcher, listener, this, getDefaultEncoding());
     }
+
+    private static class ValgrindReportFilenameFilter implements FilenameFilter {
+
+        public boolean accept(final File dir, final String name) {
+            return name.startsWith("valgrind") && name.endsWith(".xml");
+        }
+    }
+
 }

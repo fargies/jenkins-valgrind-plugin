@@ -46,7 +46,7 @@ public final class LeaksNewVersusFixedGraphPortlet extends AbstractWarningsGraph
     /** {@inheritDoc} */
     @Override
     protected String getPluginName() {
-        return "tasks";
+        return "valgrind";
     }
 
     /** {@inheritDoc} */

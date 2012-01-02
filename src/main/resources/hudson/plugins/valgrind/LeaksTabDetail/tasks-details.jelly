@@ -21,7 +21,9 @@
                   ${%leaks.line(leak.primaryLineNumber)}:
                 </j:otherwise>
               </j:choose>
-              ${leak.match}
+              <p>
+              ${leak.toolTip}
+              </p>
             </p>
           </td>
         </tr>

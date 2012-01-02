@@ -46,7 +46,7 @@ public final class LeaksPriorityGraphPortlet extends AbstractWarningsGraphPortle
     /** {@inheritDoc} */
     @Override
     protected String getPluginName() {
-        return "tasks";
+        return "valgrind";
     }
 
     /** {@inheritDoc} */
