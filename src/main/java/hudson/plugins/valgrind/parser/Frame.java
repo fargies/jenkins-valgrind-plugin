@@ -8,6 +8,8 @@ import java.io.Serializable;
  * @author Sylvain Fargier
  */
 public class Frame implements Serializable {
+    /** Unique identifier of this class. */
+    private static final long serialVersionUID = -7251447912916231327L;
     private String ip;
     private String obj;
     private String fn;

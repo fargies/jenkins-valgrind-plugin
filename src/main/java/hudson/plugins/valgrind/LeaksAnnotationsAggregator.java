@@ -11,8 +11,6 @@ import hudson.plugins.analysis.core.ParserResult;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * Aggregates {@link LeaksResultAction}s of {@link MatrixRun}s into
  * {@link MatrixBuild}.
@@ -24,13 +22,6 @@ public class LeaksAnnotationsAggregator extends MatrixAggregator {
     private final ParserResult totals = new ParserResult();
     private final HealthDescriptor healthDescriptor;
     private final String defaultEncoding;
-
-    /** Tag identifiers indicating high priority. */
-    private final String highTags = StringUtils.EMPTY;
-    /** Tag identifiers indicating normal priority. */
-    private final String normalTags = StringUtils.EMPTY;
-    /** Tag identifiers indicating low priority. */
-    private final String lowTags = StringUtils.EMPTY;
 
     /**
      * Creates a new instance of {@link AnnotationsAggregator}.

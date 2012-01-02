@@ -39,7 +39,7 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
      */
     @Test
     public void test1Leak() {
-        checkSummaryText(1, 2, 0, "Memory Leaks: <a href=\"leaksResult\">1 memory leak</a>");
+        checkSummaryText(1, 2, 0, "Memory Leaks: <a href=\"valgrindResult\">1 memory leak</a>");
     }
 
     /**
@@ -47,7 +47,7 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
      */
     @Test
     public void test5Leaks() {
-        checkSummaryText(5, 1, 0, "Memory Leaks: <a href=\"leaksResult\">5 memory leaks</a>");
+        checkSummaryText(5, 1, 0, "Memory Leaks: <a href=\"valgrindResult\">5 memory leaks</a>");
     }
 
     /**
@@ -83,7 +83,7 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
      */
     @Test
     public void testOnly1New() {
-        checkDeltaText(0, 1, "<li><a href=\"leaksResult/new\">1 new memory leak</a></li>");
+        checkDeltaText(0, 1, "<li><a href=\"valgrindResult/new\">1 new memory leak</a></li>");
     }
 
     /**
@@ -91,7 +91,7 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
      */
     @Test
     public void testOnly5New() {
-        checkDeltaText(0, 5, "<li><a href=\"leaksResult/new\">5 new memory leaks</a></li>");
+        checkDeltaText(0, 5, "<li><a href=\"valgrindResult/new\">5 new memory leaks</a></li>");
     }
 
     /**
@@ -99,7 +99,7 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
      */
     @Test
     public void testOnly1Fixed() {
-        checkDeltaText(1, 0, "<li><a href=\"leaksResult/fixed\">1 fixed leak</a></li>");
+        checkDeltaText(1, 0, "<li><a href=\"valgrindResult/fixed\">1 fixed leak</a></li>");
     }
 
     /**
@@ -107,7 +107,7 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
      */
     @Test
     public void testOnly5Fixed() {
-        checkDeltaText(5, 0, "<li><a href=\"leaksResult/fixed\">5 fixed leaks</a></li>");
+        checkDeltaText(5, 0, "<li><a href=\"valgrindResult/fixed\">5 fixed leaks</a></li>");
     }
 
     /**
@@ -116,8 +116,8 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
     @Test
     public void test5New5Fixed() {
         checkDeltaText(5, 5,
-                "<li><a href=\"leaksResult/new\">5 new memory leaks</a></li>"
-                + "<li><a href=\"leaksResult/fixed\">5 fixed leaks</a></li>");
+                "<li><a href=\"valgrindResult/new\">5 new memory leaks</a></li>"
+                + "<li><a href=\"valgrindResult/fixed\">5 fixed leaks</a></li>");
     }
 
     /**
@@ -126,8 +126,8 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
     @Test
     public void test5New1Fixed() {
         checkDeltaText(1, 5,
-        "<li><a href=\"leaksResult/new\">5 new memory leaks</a></li>"
-        + "<li><a href=\"leaksResult/fixed\">1 fixed leak</a></li>");
+        "<li><a href=\"valgrindResult/new\">5 new memory leaks</a></li>"
+        + "<li><a href=\"valgrindResult/fixed\">1 fixed leak</a></li>");
     }
 
     /**
@@ -136,8 +136,8 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
     @Test
     public void test1New5Fixed() {
         checkDeltaText(5, 1,
-                "<li><a href=\"leaksResult/new\">1 new memory leak</a></li>"
-                + "<li><a href=\"leaksResult/fixed\">5 fixed leaks</a></li>");
+                "<li><a href=\"valgrindResult/new\">1 new memory leak</a></li>"
+                + "<li><a href=\"valgrindResult/fixed\">5 fixed leaks</a></li>");
     }
 
     /**
@@ -146,8 +146,8 @@ public class ResultSummaryTest extends AbstractEnglishLocaleTest {
     @Test
     public void test1New1Fixed() {
         checkDeltaText(1, 1,
-                "<li><a href=\"leaksResult/new\">1 new memory leak</a></li>"
-                + "<li><a href=\"leaksResult/fixed\">1 fixed leak</a></li>");
+                "<li><a href=\"valgrindResult/new\">1 new memory leak</a></li>"
+                + "<li><a href=\"valgrindResult/fixed\">1 fixed leak</a></li>");
     }
 
     /**

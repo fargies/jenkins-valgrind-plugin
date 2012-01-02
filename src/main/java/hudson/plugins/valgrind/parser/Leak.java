@@ -22,7 +22,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class Leak implements FileAnnotation, Serializable {
     /** Unique identifier of this class. */
-    private static final long serialVersionUID = 5171662552905752370L;
+    private static final long serialVersionUID = -7610946922529535828L;
     /** Current key of this annotation. */
     private static long currentKey;
     /** Temporary directory holding the workspace files. */
@@ -182,10 +182,12 @@ public class Leak implements FileAnnotation, Serializable {
 
     /** {@inheritDoc} */
     public void setFileName(final String fileName) {
+    	/* can't set filename on those Annotations (the first Frame fileName is used). */
     }
 
     /** {@inheritDoc} */
     public void setPathName(final String workspacePath) {
+    	/* can't set pathName on those Annotations. */
     }
 
     /** {@inheritDoc} */
@@ -215,6 +217,7 @@ public class Leak implements FileAnnotation, Serializable {
 
     /** {@inheritDoc} */
     public void setModuleName(final String moduleName) {
+    	/* this plugin is C/C++ specific, no moduleName with those languages */
     }
 
     /** {@inheritDoc} */
@@ -261,7 +264,8 @@ public class Leak implements FileAnnotation, Serializable {
     public String getMessage() {
         return message;
     }
-    private void dumpStack(final LinkedList<Frame> frame, final StringBuilder sb) {
+
+    private void dumpStack(final StringBuilder sb) {
         ListIterator<Frame> it = frame.listIterator(frame.size());
 
         Frame topFrame = it.previous();
@@ -283,7 +287,7 @@ public class Leak implements FileAnnotation, Serializable {
     public String getToolTip() {
         StringBuilder tooltip = new StringBuilder();
         tooltip.append(message + "<br/>");
-        dumpStack(frame, tooltip);
+        dumpStack(tooltip);
         return tooltip.toString();
     }
 
