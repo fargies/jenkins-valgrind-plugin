@@ -17,9 +17,95 @@ public class Frame implements Serializable {
     private String file;
     private int line;
 
+    /**
+     * Creates a new instance of {@link Frame}.
+     * @param ip
+     * @param obj
+     * @param fn
+     * @param dir
+     * @param file
+     * @param line
+     */
+    public Frame(final String ip, final String obj,
+            final String fn, final String dir,
+            final String file, final int line) {
+        super();
+        this.ip = ip;
+        this.obj = obj;
+        this.fn = fn;
+        this.dir = dir;
+        this.file = file;
+        this.line = line;
+    }
+
     public Frame() {
+        super();
         ip = "";
         line = -1;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((dir == null) ? 0 : dir.hashCode());
+        result = prime * result + ((file == null) ? 0 : file.hashCode());
+        result = prime * result + ((fn == null) ? 0 : fn.hashCode());
+        result = prime * result + line;
+        result = prime * result + ((obj == null) ? 0 : obj.hashCode());
+        return result;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Frame other = (Frame)obj;
+        if (dir == null) {
+            if (other.dir != null) {
+                return false;
+            }
+        }
+        else if (!dir.equals(other.dir)) {
+            return false;
+        }
+        if (file == null) {
+            if (other.file != null) {
+                return false;
+            }
+        }
+        else if (!file.equals(other.file)) {
+            return false;
+        }
+        if (fn == null) {
+            if (other.fn != null) {
+                return false;
+            }
+        }
+        else if (!fn.equals(other.fn)) {
+            return false;
+        }
+        if (line != other.line) {
+            return false;
+        }
+        if (this.obj == null) {
+            if (other.obj != null) {
+                return false;
+            }
+        }
+        else if (!this.obj.equals(other.obj)) {
+            return false;
+        }
+        return true;
     }
 
     /**

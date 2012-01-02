@@ -33,8 +33,8 @@ public class TaskScannerTest {
         ParserResult result = new LeakParser().parse(file, null);
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 4, result.getNumberOfAnnotations());
 
-        assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 0, result.getNumberOfAnnotations(Priority.HIGH));
-        assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 4, result.getNumberOfAnnotations(Priority.NORMAL));
+        assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 4, result.getNumberOfAnnotations(Priority.HIGH));
+        assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 0, result.getNumberOfAnnotations(Priority.NORMAL));
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 0, result.getNumberOfAnnotations(Priority.LOW));
     }
 

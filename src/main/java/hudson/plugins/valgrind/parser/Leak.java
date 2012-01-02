@@ -16,9 +16,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A serializable Java Bean class representing an open task.
+ * A serializable Java Bean class representing an Memory Leak.
  *
- * @author Ulli Hafner
+ * @author Sylvain Fargier
  */
 public class Leak implements FileAnnotation, Serializable {
     /** Unique identifier of this class. */
@@ -30,7 +30,6 @@ public class Leak implements FileAnnotation, Serializable {
 
     /** unique identifier */
     private final String message;
-    private final Priority priority;
     private final LeakType type;
     private final LinkedList<Frame> frame;
     private final long key;
@@ -59,7 +58,6 @@ public class Leak implements FileAnnotation, Serializable {
         this.message = message;
         this.type = type;
         this.frame = frame;
-        priority = Priority.NORMAL;
         contextHashCode = key = currentKey++;
     }
 
@@ -79,31 +77,43 @@ public class Leak implements FileAnnotation, Serializable {
         return hashCode() - o.hashCode(); // fallback
     }
 
+    /** {@inheritDoc} */
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-        }
-        if (obj == null) {
+        if (obj == null)
             return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (getClass() != obj.getClass())
             return false;
-        }
         Leak other = (Leak)obj;
-        if (message != other.message) {
-            return false;
-        }
 
-        if (type != other.type) {
-            return false;
+        if (message == null) {
+            if (other.message != null)
+                return false;
         }
-
-        if (getFirstFrame() != other.getFirstFrame()) {
+        else if (!message.equals(other.message))
             return false;
+        if (type != other.type)
+            return false;
+        if (frame == null) {
+            if (other.frame != null)
+                return false;
         }
-
+        else if (!frame.equals(other.frame))
+            return false;
         return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((frame == null) ? 0 : frame.hashCode());
+        result = prime * result + ((message == null) ? 0 : message.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
     }
 
     /** {@inheritDoc} */
@@ -149,7 +159,7 @@ public class Leak implements FileAnnotation, Serializable {
 
     /** {@inheritDoc} */
     public Priority getPriority() {
-        return priority;
+        return type.getPriority();
     }
 
     /** {@inheritDoc} */

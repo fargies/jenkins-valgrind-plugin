@@ -1,5 +1,7 @@
 package hudson.plugins.valgrind.parser;
 
+import hudson.plugins.analysis.util.model.Priority;
+
 /**
  * FIXME: Document type LeakType.
  *
@@ -23,5 +25,28 @@ public enum LeakType {
 
     public static LeakType fromString(final String type) {
         return LeakType.valueOf(type);
+    }
+
+    public Priority getPriority() {
+        switch (this) {
+            case Overlap:
+            case InvalidMemPool:
+            case Leak_StillReachable:
+            case Leak_PossiblyLost:
+            case Leak_IndirectlyLost:
+                return Priority.NORMAL;
+
+            case Leak_DefinitelyLost:
+            case ClientCheck:
+            case SyscallParam:
+            case InvalidFree:
+            case InvalidWrite:
+            case InvalidJump:
+            case MismatchedFree:
+            case InvalidRead:
+            case UninitCondition:
+                return Priority.HIGH;
+        }
+        return Priority.NORMAL;
     }
 }

@@ -112,11 +112,12 @@ public class LeaksPublisher extends HealthAwarePublisher {
     /**
      * Returns the Valgrind XML reportFiles to work with.
      *
-     * @return Valgrind XML reportFiles to work with
+     * @return Valgrind XML reportFiles to work with.
      */
-    public String getFile() {
+    public String getReportFiles() {
         return reportFiles;
     }
+
 
     /** {@inheritDoc} */
     @Override
@@ -137,7 +138,9 @@ public class LeaksPublisher extends HealthAwarePublisher {
         FilePath[] reports = new FilePath[0];
 
         // throws IOExceptions on error
-        reports = root.list(reportFiles);
+        if (reportFiles != null) {
+            reports = root.list(reportFiles);
+        }
 
         if (reports.length == 0) {
             logger.log("No Valgrind XML report reportFiles were found using the pattern '" +
