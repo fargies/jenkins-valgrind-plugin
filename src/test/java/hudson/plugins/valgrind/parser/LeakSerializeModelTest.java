@@ -10,12 +10,12 @@ import com.thoughtworks.xstream.XStream;
  *
  * @see <a href="http://www.ibm.com/developerworks/library/j-serialtest.html">Testing object serialization</a>
  */
-public abstract class TaskSerializeModelTest extends AbstractSerializeModelTest {
+public abstract class LeakSerializeModelTest extends AbstractSerializeModelTest {
     /** Serialization provider. */
     private static final XStream XSTREAM = new AnnotationStream();
 
     static {
-        XSTREAM.alias("task", Leak.class);
+        XSTREAM.alias("leak", Leak.class);
     }
 
     /** {@inheritDoc} */

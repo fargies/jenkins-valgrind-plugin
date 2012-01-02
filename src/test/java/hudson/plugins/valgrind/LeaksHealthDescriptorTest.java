@@ -16,7 +16,7 @@ import org.jvnet.localizer.Localizable;
  *
  * @author Ulli Hafner
  */
-public class TasksHealthDescriptorTest extends AbstractHealthDescriptorTest {
+public class LeaksHealthDescriptorTest extends AbstractHealthDescriptorTest {
     /**
      * Verifies the different messages if the number of items are 0, 1, and 2.
      */

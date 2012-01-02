@@ -20,7 +20,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author Sylvain Fargier
  */
-public class Leak implements FileAnnotation, Serializable {
+public final class Leak implements FileAnnotation, Serializable {
     /** Unique identifier of this class. */
     private static final long serialVersionUID = -7610946922529535828L;
     /** Current key of this annotation. */
@@ -37,7 +37,7 @@ public class Leak implements FileAnnotation, Serializable {
      * Context hash code of this annotation. This hash code is used to decide if
      * two annotations are equal even if the equals method returns <code>false</code>.
      */
-    private long contextHashCode;
+    private transient int contextHashCode;
 
     /** Origin of the annotation. */
     public static final String ORIGIN = "valgrind";
@@ -58,7 +58,8 @@ public class Leak implements FileAnnotation, Serializable {
         this.message = message;
         this.type = type;
         this.frame = frame;
-        contextHashCode = key = currentKey++;
+        key = currentKey++;
+        genHashCode();
     }
 
     /** {@inheritDoc} */
@@ -79,40 +80,37 @@ public class Leak implements FileAnnotation, Serializable {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         Leak other = (Leak)obj;
 
-        if (message == null) {
-            if (other.message != null)
-                return false;
-        }
-        else if (!message.equals(other.message))
-            return false;
-        if (type != other.type)
-            return false;
-        if (frame == null) {
-            if (other.frame != null)
-                return false;
-        }
-        else if (!frame.equals(other.frame))
-            return false;
-        return true;
+        return hashCode() == other.hashCode();
     }
 
     /** {@inheritDoc} */
     @Override
     public int hashCode() {
+        if (contextHashCode == 0) {
+            genHashCode();
+        }
+        return contextHashCode;
+    }
+
+    public int genHashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((frame == null) ? 0 : frame.hashCode());
         result = prime * result + ((message == null) ? 0 : message.hashCode());
         result = prime * result + ((type == null) ? 0 : type.hashCode());
+        contextHashCode = result;
         return result;
     }
 
@@ -262,12 +260,14 @@ public class Leak implements FileAnnotation, Serializable {
 
     /** {@inheritDoc} */
     public long getContextHashCode() {
-        return contextHashCode;
+        return hashCode();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Does not set the hashCode, regenerate it.
+     */
     public void setContextHashCode(final long contextHashCode) {
-        this.contextHashCode = contextHashCode;
+        genHashCode();
     }
 
     /** {@inheritDoc} */

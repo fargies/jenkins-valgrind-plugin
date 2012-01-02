@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * Tests the class {@link LeakScanner}.
  */
-public class TaskScannerTest {
+public class LeakScannerTest {
     private static final String TEST_FILE = "tasks-case-test.txt";
     /** Test file. */
     private static final String FILE_WITH_TASKS = "file-with-tasks.txt";
@@ -28,7 +28,7 @@ public class TaskScannerTest {
      */
     @Test
     public void scanFileWithWords() throws IOException {
-        InputStream file = TaskScannerTest.class.getResourceAsStream("file-with-leaks.xml");
+        InputStream file = LeakScannerTest.class.getResourceAsStream("file-with-leaks.xml");
 
         ParserResult result = new LeakParser().parse(file, null);
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 4, result.getNumberOfAnnotations());
@@ -65,7 +65,7 @@ public class TaskScannerTest {
      */
     /** FIXME @Test */
     public void scanFileWithoutTasks() throws IOException {
-        InputStream file = TaskScannerTest.class.getResourceAsStream("clean-report.xml");
+        InputStream file = LeakScannerTest.class.getResourceAsStream("clean-report.xml");
 
         ParserResult result = new LeakParser().parse(file, null);
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 0, result.getNumberOfAnnotations());
