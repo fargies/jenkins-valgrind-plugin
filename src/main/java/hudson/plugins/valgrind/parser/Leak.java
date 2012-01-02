@@ -266,20 +266,36 @@ public class Leak implements FileAnnotation, Serializable {
     }
 
     private void dumpStack(final StringBuilder sb) {
-        ListIterator<Frame> it = frame.listIterator(frame.size());
+        ListIterator<Frame> it = frame.listIterator();
 
-        Frame topFrame = it.previous();
+        if (!it.hasNext()) {
+            return;
+        }
+
+        Frame topFrame = it.next();
         Formatter form = new Formatter(sb);
-        form.format("&nbsp;at %s: %s (%s:%d)<br/>",
-                topFrame.getIp(), topFrame.getFn(),
-                topFrame.getFile(), topFrame.getLine());
+        form.format("&nbsp;at %s: %s ",
+                topFrame.getIp(),
+                (topFrame.getFn() != null) ? topFrame.getFn() : "???");
+        if (topFrame.getFile() != null) {
+            form.format("(%s:%d)<br/>", topFrame.getFile(), topFrame.getLine());
+        }
+        else {
+            form.format("(in %s)<br/>", topFrame.getObj());
+        }
 
-        while (it.hasPrevious()) {
-            topFrame = it.previous();
+        while (it.hasNext()) {
+            topFrame = it.next();
 
-            form.format("&nbsp;by %s: %s (%s:%d)<br/>",
-                    topFrame.getIp(), topFrame.getFn(),
-                    topFrame.getFile(), topFrame.getLine());
+            form.format("&nbsp;by %s: %s ",
+                    topFrame.getIp(),
+                    (topFrame.getFn() != null) ? topFrame.getFn() : "???");
+            if (topFrame.getFile() != null) {
+                form.format("(%s:%d)<br/>", topFrame.getFile(), topFrame.getLine());
+            }
+            else {
+                form.format("(in %s)<br/>", topFrame.getObj());
+            }
         }
     }
 
