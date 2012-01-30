@@ -13,9 +13,6 @@ import org.junit.Test;
  * Tests the class {@link LeakScanner}.
  */
 public class LeakScannerTest {
-    private static final String TEST_FILE = "tasks-case-test.txt";
-    /** Test file. */
-    private static final String FILE_WITH_TASKS = "file-with-tasks.txt";
     /** Error message. */
     private static final String WRONG_MESSAGE_ERROR = "Wrong message returned.";
     /** Error message. */
@@ -57,6 +54,20 @@ public class LeakScannerTest {
         leak = result.iterator().next();
         assertEquals("Type is not the found token", FIXME, leak.getType());
     }*/
+
+    @Test
+    public void scanFailure() throws IOException {
+        InputStream file = LeakScannerTest.class.getResourceAsStream("corrupted-file.xml");
+
+        try {
+            ParserResult result = new LeakParser().parse(file, null);
+            fail("An assertion should have been raised");
+        }
+        catch (IOException e)
+        {
+            return;
+        }
+    }
 
     /**
      * Checks whether we find no leaks in the report file.

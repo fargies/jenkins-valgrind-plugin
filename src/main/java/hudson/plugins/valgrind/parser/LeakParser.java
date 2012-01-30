@@ -275,7 +275,11 @@ public class LeakParser {
                         setDataCollect(false);
                     }
                     else if ("kind".equals(qName)) {
-                        kind = LeakType.fromString(getData());
+                        try {
+                            kind = LeakType.fromString(getData());
+                        } catch (IllegalArgumentException e) {
+                            throw new SAXException("Failed to parse \"kind\": " + getData(), e);
+                        }
                         setDataCollect(false);
                     }
                     else if ("what".equals(qName)) {

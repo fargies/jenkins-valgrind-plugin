@@ -16,6 +16,7 @@ public enum LeakType {
     Overlap,
     InvalidMemPool,
     UninitCondition,
+    UninitValue,
     SyscallParam,
     ClientCheck,
     Leak_DefinitelyLost,
