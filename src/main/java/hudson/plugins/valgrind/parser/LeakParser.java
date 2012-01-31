@@ -1,6 +1,8 @@
 package hudson.plugins.valgrind.parser;
 
+import hudson.FilePath;
 import hudson.plugins.analysis.core.ParserResult;
+import hudson.plugins.analysis.util.ContextHashCode;
 import hudson.util.IOException2;
 
 import java.io.File;
@@ -41,7 +43,7 @@ public class LeakParser {
         }
     }
 
-    public ParserResult parse(final File file, final ParserResult collect) throws IOException
+    public ParserResult parse(final File file, final ParserResult collect, final FilePath workspace, final String defaultEncoding) throws IOException
     {
         ParserResult result;
 
@@ -52,10 +54,12 @@ public class LeakParser {
             result = collect;
         }
 
+        final String remotePath = (workspace != null) ? workspace.getRemote() : null;
+
         try {
             createParser();
 
-            ValgrindXMLHandler handler = new ValgrindXMLHandler(result);
+            ValgrindXMLHandler handler = new ValgrindXMLHandler(result, remotePath, defaultEncoding);
             parser.parse(file, handler);
 
         } catch (ParserConfigurationException e) {
@@ -66,7 +70,7 @@ public class LeakParser {
         return result;
     }
 
-    public ParserResult parse(final InputStream in, final ParserResult collect) throws IOException
+    public ParserResult parse(final InputStream in, final ParserResult collect, final FilePath workspace, final String defaultEncoding) throws IOException
     {
         ParserResult result;
 
@@ -77,10 +81,12 @@ public class LeakParser {
             result = collect;
         }
 
+        final String remotePath = (workspace != null) ? workspace.getRemote() : null;
+
         try {
             createParser();
 
-            ValgrindXMLHandler handler = new ValgrindXMLHandler(result);
+            ValgrindXMLHandler handler = new ValgrindXMLHandler(result, remotePath, defaultEncoding);
             parser.parse(in, handler);
 
         } catch (ParserConfigurationException e) {
@@ -106,6 +112,8 @@ public class LeakParser {
      */
     private class ValgrindXMLHandler extends DefaultHandler {
         private final ParserResult rootLeaks;
+        private final String workspace;
+        private final String defaultEncoding;
         private LinkedList<Frame> frame;
         private String unique;
         private String tid;
@@ -120,9 +128,11 @@ public class LeakParser {
          * @param rootLeaks
          *      Leaks collection, parsed Leaks will be added to the collection.
          */
-        public ValgrindXMLHandler(final ParserResult rootLeaks)
+        public ValgrindXMLHandler(final ParserResult rootLeaks, final String workspace, final String defaultEncoding)
         {
             this.rootLeaks = rootLeaks;
+            this.workspace = workspace;
+            this.defaultEncoding = defaultEncoding;
         }
 
         public void clearCache()
@@ -262,7 +272,32 @@ public class LeakParser {
 
                 case ERROR:
                     if (qName.equals("error")) {
-                        rootLeaks.addAnnotation(new Leak(message, kind, frame));
+                        Leak leak = null;
+
+                        int frame_index = -1;
+                        if (workspace != null) {
+                            for (Frame f : frame) {
+                                ++frame_index;
+                                if (f.getDir().startsWith(workspace)) {
+
+                                    leak = new Leak(message, kind, frame, frame_index);
+                                    ContextHashCode hashCode = new ContextHashCode();
+                                    try {
+                                        leak.setContextHashCode(hashCode.create(
+                                                f.getDir() + '/' + f.getFile(), f.getLine(), defaultEncoding));
+                                    }
+                                    catch (IOException e) {
+                                        throw new SAXException("Failed to create Leak object ", e);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        if (leak == null) {
+                            leak = new Leak(message, kind, frame);
+                        }
+
+                        rootLeaks.addAnnotation(leak);
                         ctx = XMLContext.ROOT;
                         clearCache();
                     }

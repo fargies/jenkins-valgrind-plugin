@@ -27,7 +27,7 @@ public class LeakScannerTest {
     public void scanFileWithWords() throws IOException {
         InputStream file = LeakScannerTest.class.getResourceAsStream("file-with-leaks.xml");
 
-        ParserResult result = new LeakParser().parse(file, null);
+        ParserResult result = new LeakParser().parse(file, null, null, null);
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 4, result.getNumberOfAnnotations());
 
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 4, result.getNumberOfAnnotations(Priority.HIGH));
@@ -60,7 +60,7 @@ public class LeakScannerTest {
         InputStream file = LeakScannerTest.class.getResourceAsStream("corrupted-file.xml");
 
         try {
-            ParserResult result = new LeakParser().parse(file, null);
+            ParserResult result = new LeakParser().parse(file, null, null, null);
             fail("An assertion should have been raised");
         }
         catch (IOException e)
@@ -78,7 +78,7 @@ public class LeakScannerTest {
     public void scanFileWithoutTasks() throws IOException {
         InputStream file = LeakScannerTest.class.getResourceAsStream("clean-report.xml");
 
-        ParserResult result = new LeakParser().parse(file, null);
+        ParserResult result = new LeakParser().parse(file, null, null, null);
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 0, result.getNumberOfAnnotations());
     }
 }

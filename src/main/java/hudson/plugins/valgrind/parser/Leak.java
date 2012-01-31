@@ -32,12 +32,13 @@ public final class Leak implements FileAnnotation, Serializable {
     private final String message;
     private final LeakType type;
     private final LinkedList<Frame> frame;
+    private final int frame_index;
     private final long key;
     /**
      * Context hash code of this annotation. This hash code is used to decide if
      * two annotations are equal even if the equals method returns <code>false</code>.
      */
-    private transient int contextHashCode;
+    private transient long contextHashCode;
 
     /** Origin of the annotation. */
     public static final String ORIGIN = "valgrind";
@@ -53,13 +54,37 @@ public final class Leak implements FileAnnotation, Serializable {
      *            the message type.
      * @param frame
      *            the associated stackframe.
+     * @param frame_index
+     *            the frame index where the leak is (in the workspace).
+     */
+    public Leak(final String message, final LeakType type, final LinkedList<Frame> frame, final int frame_index) {
+        this.message = message;
+        this.type = type;
+        this.frame = frame;
+        this.frame_index = frame_index;
+        key = currentKey++;
+        contextHashCode = currentKey; /* will be overridden soon */
+    }
+
+    /**
+     * Creates a new instance of {@link Leak}.
+     *
+     * @details no frame in the stack could be associated with this error.
+     *
+     * @param message
+     *            the associated message.
+     * @param type
+     *            the message type.
+     * @param frame
+     *            the associated stackframe.
      */
     public Leak(final String message, final LeakType type, final LinkedList<Frame> frame) {
         this.message = message;
         this.type = type;
         this.frame = frame;
+        frame_index = -1;
         key = currentKey++;
-        genHashCode();
+        contextHashCode = hashCode();
     }
 
     /** {@inheritDoc} */
@@ -91,26 +116,40 @@ public final class Leak implements FileAnnotation, Serializable {
             return false;
         }
         Leak other = (Leak)obj;
-
-        return hashCode() == other.hashCode();
+        if (frame == null) {
+            if (other.frame != null) {
+                return false;
+            }
+        }
+        else if (!frame.equals(other.frame)) {
+            return false;
+        }
+        if (frame_index != other.frame_index) {
+            return false;
+        }
+        if (message == null) {
+            if (other.message != null) {
+                return false;
+            }
+        }
+        else if (!message.equals(other.message)) {
+            return false;
+        }
+        if (type != other.type) {
+            return false;
+        }
+        return true;
     }
 
     /** {@inheritDoc} */
     @Override
     public int hashCode() {
-        if (contextHashCode == 0) {
-            genHashCode();
-        }
-        return contextHashCode;
-    }
-
-    public int genHashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((frame == null) ? 0 : frame.hashCode());
+        result = prime * result + frame_index;
         result = prime * result + ((message == null) ? 0 : message.hashCode());
         result = prime * result + ((type == null) ? 0 : type.hashCode());
-        contextHashCode = result;
         return result;
     }
 
@@ -127,18 +166,11 @@ public final class Leak implements FileAnnotation, Serializable {
     }
 
     private Frame getFirstFrame() {
-        if (frame == null || frame.isEmpty()) {
-            return null;
-        }
-        else if (type == LeakType.Leak_DefinitelyLost ||
-                type == LeakType.Leak_IndirectlyLost ||
-                type == LeakType.Leak_PossiblyLost ||
-                type == LeakType.Leak_StillReachable)
-        {
-            return frame.getLast();
+        if (frame_index != -1) {
+            return frame.get(frame_index);
         }
         else {
-            return frame.getFirst();
+            return null;
         }
     }
 
@@ -213,8 +245,7 @@ public final class Leak implements FileAnnotation, Serializable {
             return FilenameUtils.getName(f.getFile());
         }
         else {
-            return
-                    EXTERNAL_MODULE;
+            return EXTERNAL_MODULE;
         }
     }
 
@@ -260,14 +291,20 @@ public final class Leak implements FileAnnotation, Serializable {
 
     /** {@inheritDoc} */
     public long getContextHashCode() {
-        return hashCode();
+        return contextHashCode;
     }
 
     /**
-     * Does not set the hashCode, regenerate it.
+     * @details
+     * If there is no frame associated with this Leak the hashCode is regenrated rather than set.
      */
     public void setContextHashCode(final long contextHashCode) {
-        genHashCode();
+        if (frame_index == -1) {
+            this.contextHashCode = hashCode();
+        }
+        else {
+            this.contextHashCode = contextHashCode;
+        }
     }
 
     /** {@inheritDoc} */

@@ -133,7 +133,7 @@ public class LeaksPublisher extends HealthAwarePublisher {
         final FilePath root =
                 (moduleRoots != null && moduleRoots.length > 1) ?
                         build.getWorkspace() : build.getModuleRoot();
-        ParserResult project = new ParserResult();
+        ParserResult project = new ParserResult(root);
 
         FilePath[] reports = new FilePath[0];
 
@@ -150,7 +150,7 @@ public class LeaksPublisher extends HealthAwarePublisher {
 
         LeakParser parser = new LeakParser();
         for (int i = 0; i < reports.length; ++i) {
-            parser.parse(reports[i].read(), project);
+            parser.parse(reports[i].read(), project, root, getDefaultEncoding());
         }
 
         logger.logLines(project.getLogMessages());
