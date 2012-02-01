@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -120,6 +122,7 @@ public class LeakParser {
         private LeakType kind;
         private String message;
         private StringBuilder data;
+        private final Pattern message_filter;
 
         private XMLContext ctx;
 
@@ -133,6 +136,18 @@ public class LeakParser {
             this.rootLeaks = rootLeaks;
             this.workspace = workspace;
             this.defaultEncoding = defaultEncoding;
+            message_filter = Pattern.compile("^(.*) in loss record \\d+ of \\d+$");
+        }
+
+        private String filterMessage(final String rawMessage)
+        {
+            Matcher match = message_filter.matcher(rawMessage);
+            if (match.find()) {
+                return match.group(1);
+            }
+            else {
+                return rawMessage;
+            }
         }
 
         public void clearCache()
@@ -265,7 +280,7 @@ public class LeakParser {
                         setDataCollect(false);
                     }
                     else if (qName.equals("text")) {
-                        message = getData();
+                        message = filterMessage(getData());
                     }
                     clearData();
                     break;
@@ -318,7 +333,7 @@ public class LeakParser {
                         setDataCollect(false);
                     }
                     else if ("what".equals(qName)) {
-                        message = getData();
+                        message = filterMessage(getData());
                         setDataCollect(false);
                     }
                     break;

@@ -1,9 +1,14 @@
 package hudson.plugins.valgrind.parser;
 
 import static org.junit.Assert.*;
+import hudson.FilePath;
 import hudson.plugins.analysis.core.AnnotationDifferencer;
+import hudson.plugins.analysis.core.ParserResult;
 import hudson.plugins.analysis.util.model.FileAnnotation;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -125,5 +130,44 @@ public class LeaksDifferencerTest {
         assertEquals(WARNINGS_COUNT_ERROR, 0, AnnotationDifferencer.getNewAnnotations(actual, previous).size());
     }
 
+    /**
+     * Parse the same file twice and check that nothing differs.
+     * @throws IOException
+     */
+    @Test
+    public void testParseTwice() throws IOException {
+        InputStream file = LeakScannerTest.class.getResourceAsStream("app-run-1.xml");
+        FilePath workspace = new FilePath(new File("/opt/jenkins/workspace"));
+
+        ParserResult result = new LeakParser().parse(file, null, workspace, null);
+        Set<FileAnnotation> ann = result.getAnnotations();
+
+        file = LeakScannerTest.class.getResourceAsStream("app-run-1.xml");
+        ParserResult result2 = new LeakParser().parse(file, null, workspace, null);
+        Set<FileAnnotation> ann2 = result2.getAnnotations();
+
+        assertEquals(ANNOTATIONS_ARE_NOT_EQUAL, 0, AnnotationDifferencer.getFixedAnnotations(ann, ann2).size());
+        assertEquals(ANNOTATIONS_ARE_NOT_EQUAL, 0, AnnotationDifferencer.getNewAnnotations(ann, ann2).size());
+    }
+
+    /**
+     * Check that two files generated from the same binary are (almost) equal.
+     */
+    @Test
+    public void testParseTwoExec() throws IOException {
+        InputStream file = LeakScannerTest.class.getResourceAsStream("app-run-1.xml");
+        FilePath workspace = new FilePath(new File("/opt/jenkins/workspace"));
+
+        ParserResult result = new LeakParser().parse(file, null, workspace, null);
+        Set<FileAnnotation> ann = result.getAnnotations();
+
+        file = LeakScannerTest.class.getResourceAsStream("app-run-2.xml");
+        ParserResult result2 = new LeakParser().parse(file, null, workspace, null);
+        Set<FileAnnotation> ann2 = result2.getAnnotations();
+
+        Set<FileAnnotation> fixed = AnnotationDifferencer.getFixedAnnotations(ann, ann2);
+        assertEquals(ANNOTATIONS_ARE_NOT_EQUAL, 5, AnnotationDifferencer.getFixedAnnotations(ann, ann2).size());
+        assertEquals(ANNOTATIONS_ARE_NOT_EQUAL, 4, AnnotationDifferencer.getNewAnnotations(ann, ann2).size());
+    }
 }
 
