@@ -165,7 +165,7 @@ public final class Leak implements FileAnnotation, Serializable {
         }
     }
 
-    private Frame getFirstFrame() {
+    public final Frame getFirstFrame() {
         if (frame_index != -1) {
             return frame.get(frame_index);
         }

@@ -278,7 +278,7 @@ public class LeakParser {
                         if (workspace != null) {
                             for (Frame f : frame) {
                                 ++frame_index;
-                                if (f.getDir().startsWith(workspace)) {
+                                if (f.getDir() != null && f.getDir().startsWith(workspace)) {
 
                                     leak = new Leak(message, kind, frame, frame_index);
                                     ContextHashCode hashCode = new ContextHashCode();
@@ -287,7 +287,7 @@ public class LeakParser {
                                                 f.getDir() + '/' + f.getFile(), f.getLine(), defaultEncoding));
                                     }
                                     catch (IOException e) {
-                                        throw new SAXException("Failed to create Leak object ", e);
+                                        leak.setContextHashCode(leak.hashCode());
                                     }
                                     break;
                                 }

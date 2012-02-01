@@ -1,0 +1,270 @@
+<?xml version="1.0"?>
+
+<valgrindoutput>
+
+<protocolversion>4</protocolversion>
+<protocoltool>memcheck</protocoltool>
+
+<preamble>
+  <line>Memcheck, a memory error detector</line>
+  <line>Copyright (C) 2002-2010, and GNU GPL'd, by Julian Seward et al.</line>
+  <line>Using Valgrind-3.6.1 and LibVEX; rerun with -h for copyright info</line>
+  <line>Command: ./test_all</line>
+</preamble>
+
+<pid>30722</pid>
+<ppid>30721</ppid>
+<tool>memcheck</tool>
+
+<args>
+  <vargv>
+    <exe>/usr/bin/valgrind</exe>
+    <arg>--xml-file=valgrind.xml</arg>
+    <arg>--xml=yes</arg>
+    <arg>--num-callers=25</arg>
+    <arg>--track-origins=yes</arg>
+    <arg>--show-reachable=yes</arg>
+  </vargv>
+  <argv>
+    <exe>./test_all</exe>
+  </argv>
+</args>
+
+<status>
+  <state>RUNNING</state>
+  <time>00:00:00:00.172 </time>
+</status>
+
+<error>
+  <unique>0x2e</unique>
+  <tid>4</tid>
+  <kind>SyscallParam</kind>
+  <what>Syscall param socketcall.sendmsg(msg.msg_iov[i]) points to uninitialised byte(s)</what>
+  <stack>
+    <frame>
+      <ip>0x7136F4E</ip>
+      <obj>/lib/libpthread-2.6.1.so</obj>
+      <fn>sendmsg</fn>
+    </frame>
+    <frame>
+      <ip>0x71090DB</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x710920C</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x710772A</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x70F4ED1</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x70F4FC0</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x70F6E09</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x70F7000</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x70F70C3</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+      <fn>dbus_connection_send</fn>
+    </frame>
+    <frame>
+      <ip>0x70CBC41</ip>
+      <obj>/usr/lib/libdbus-c++-1-0.6.0-pre1.so.1.2.0</obj>
+      <fn>DBus::Connection::send(DBus::Message const&amp;, unsigned int*)</fn>
+    </frame>
+    <frame>
+      <ip>0x70C5934</ip>
+      <obj>/usr/lib/libdbus-c++-1-0.6.0-pre1.so.1.2.0</obj>
+      <fn>DBus::ObjectAdaptor::method_handler_launcher(DBus::InterfaceAdaptor*, DBus::CallMessage const&amp;)</fn>
+    </frame>
+    <frame>
+      <ip>0x70C5A7D</ip>
+      <obj>/usr/lib/libdbus-c++-1-0.6.0-pre1.so.1.2.0</obj>
+    </frame>
+    <frame>
+      <ip>0x70C46E6</ip>
+      <obj>/usr/lib/libdbus-c++-1-0.6.0-pre1.so.1.2.0</obj>
+    </frame>
+    <frame>
+      <ip>0x7130F87</ip>
+      <obj>/lib/libpthread-2.6.1.so</obj>
+    </frame>
+    <frame>
+      <ip>0x73348CD</ip>
+      <obj>/lib/libc-2.6.1.so</obj>
+      <fn>clone</fn>
+    </frame>
+  </stack>
+  <auxwhat>Address 0x73ed468 is 8 bytes inside a block of size 223 alloc'd</auxwhat>
+  <stack>
+    <frame>
+      <ip>0x649F163</ip>
+      <obj>/usr/lib/valgrind/vgpreload_memcheck-x86-linux.so</obj>
+      <fn>realloc</fn>
+    </frame>
+    <frame>
+      <ip>0x710C35A</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+      <fn>dbus_realloc</fn>
+    </frame>
+    <frame>
+      <ip>0x710CDBD</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x710CFBF</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x710D026</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x710BC52</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x710BE22</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x70FA67C</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x70FA6C5</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x70FE73C</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+      <fn>dbus_message_iter_append_basic</fn>
+    </frame>
+    <frame>
+      <ip>0x71001ED</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+      <fn>dbus_message_new_error</fn>
+    </frame>
+    <frame>
+      <ip>0x710272E</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+    </frame>
+    <frame>
+      <ip>0x70F5EB0</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+      <fn>dbus_connection_send_with_reply_and_notify</fn>
+    </frame>
+    <frame>
+      <ip>0x70F603C</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+      <fn>dbus_connection_send_with_reply</fn>
+    </frame>
+    <frame>
+      <ip>0x70F617C</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+      <fn>dbus_connection_send_with_reply_and_block</fn>
+    </frame>
+    <frame>
+      <ip>0x70F0D91</ip>
+      <obj>/usr/lib/libdbus-1.so.3.5.7</obj>
+      <fn>dbus_bus_name_has_owner</fn>
+    </frame>
+    <frame>
+      <ip>0x70CB1CF</ip>
+      <obj>/usr/lib/libdbus-c++-1-0.6.0-pre1.so.1.2.0</obj>
+      <fn>DBus::Connection::has_name(char const*)</fn>
+    </frame>
+    <frame>
+      <ip>0x6F9ABAF</ip>
+      <obj>/usr/local/lib/libtools-2.so.0.0.0</obj>
+      <fn>tools::dbus::DBusManager::requestName(std::string const&amp;)</fn>
+      <dir>/opt/jenkins/workspace/x86-target-tools2/src/dbus</dir>
+      <file>DBusManager.cpp</file>
+      <line>190</line>
+    </frame>
+    <frame>
+      <ip>0x6F9B197</ip>
+      <obj>/usr/local/lib/libtools-2.so.0.0.0</obj>
+      <fn>tools::dbus::DBusManager::init(std::string const&amp;, bool)</fn>
+      <dir>/opt/jenkins/workspace/x86-target-tools2/src/dbus</dir>
+      <file>DBusManager.cpp</file>
+      <line>206</line>
+    </frame>
+    <frame>
+      <ip>0x8079808</ip>
+      <obj>/usr/local/tests/srs/test_all</obj>
+      <fn>DBusAPITest::setUp()</fn>
+      <dir>/usr/targets/jenkins-x86/root//usr/local/include/tools2/dbus</dir>
+      <file>DBusManager.h</file>
+      <line>69</line>
+    </frame>
+    <frame>
+      <ip>0x8063289</ip>
+      <obj>/usr/local/tests/srs/test_all</obj>
+      <fn>CppUnit::TestCaller&lt;DBusAPITest&gt;::setUp()</fn>
+      <dir>/usr/targets/jenkins-x86/root//usr/include/cppunit</dir>
+      <file>TestCaller.h</file>
+      <line>177</line>
+    </frame>
+    <frame>
+      <ip>0x6E0A4EE</ip>
+      <obj>/usr/lib/libcppunit-1.12.so.0.0.0</obj>
+      <fn>CppUnit::TestCaseMethodFunctor::operator()() const</fn>
+    </frame>
+    <frame>
+      <ip>0x6E00AA4</ip>
+      <obj>/usr/lib/libcppunit-1.12.so.0.0.0</obj>
+      <fn>CppUnit::DefaultProtector::protect(CppUnit::Functor const&amp;, CppUnit::ProtectorContext const&amp;)</fn>
+    </frame>
+    <frame>
+      <ip>0x6E073C1</ip>
+      <obj>/usr/lib/libcppunit-1.12.so.0.0.0</obj>
+      <fn>CppUnit::ProtectorChain::ProtectFunctor::operator()() const</fn>
+    </frame>
+    <frame>
+      <ip>0x6E07308</ip>
+      <obj>/usr/lib/libcppunit-1.12.so.0.0.0</obj>
+      <fn>CppUnit::ProtectorChain::protect(CppUnit::Functor const&amp;, CppUnit::ProtectorContext const&amp;)</fn>
+    </frame>
+  </stack>
+  <auxwhat>Uninitialised value was created by a stack allocation</auxwhat>
+  <stack>
+    <frame>
+      <ip>0x839683A</ip>
+      <obj>/usr/local/tests/srs/test_all</obj>
+      <fn>com::play::srs::_searchRecordTasks_stub(DBus::CallMessage const&amp;)</fn>
+      <dir>/opt/jenkins/workspace/x86-target-srs/src</dir>
+      <file>ScheduledRecordingService-adaptor.h</file>
+      <line>595</line>
+    </frame>
+  </stack>
+</error>
+
+<errorcounts>
+  <pair>
+    <count>2</count>
+    <unique>0x2e</unique>
+  </pair>
+</errorcounts>
+
+<suppcounts>
+  <pair>
+    <count>43</count>
+    <name>dl-hack3-1</name>
+  </pair>
+</suppcounts>
+
+</valgrindoutput>
+

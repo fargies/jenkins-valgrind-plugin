@@ -1,11 +1,15 @@
 package hudson.plugins.valgrind.parser;
 
 import static org.junit.Assert.*;
+import hudson.FilePath;
 import hudson.plugins.analysis.core.ParserResult;
+import hudson.plugins.analysis.util.model.FileAnnotation;
 import hudson.plugins.analysis.util.model.Priority;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 
 import org.junit.Test;
 
@@ -33,6 +37,27 @@ public class LeakScannerTest {
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 4, result.getNumberOfAnnotations(Priority.HIGH));
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 0, result.getNumberOfAnnotations(Priority.NORMAL));
         assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 0, result.getNumberOfAnnotations(Priority.LOW));
+    }
+
+    /**
+     * Check that it can parse a real stack.
+     *
+     * @throws IOException if we can't read the file
+     */
+    @Test
+    public void scanFileWithCompleteStack() throws IOException {
+        InputStream file = LeakScannerTest.class.getResourceAsStream("sample-file1.xml");
+        FilePath workspace = new FilePath(new File("/opt/jenkins/workspace"));
+
+        ParserResult result = new LeakParser().parse(file, null, workspace, null);
+        assertEquals(WRONG_NUMBER_OF_TASKS_ERROR, 1, result.getNumberOfAnnotations());
+
+        Iterator<FileAnnotation> anotations = result.getAnnotations().iterator();
+        assertTrue(WRONG_NUMBER_OF_TASKS_ERROR, anotations.hasNext());
+
+        Leak leak = (Leak) anotations.next();
+        Frame frame = leak.getFirstFrame();
+        assertTrue("Failed to find the right frame", frame != null);
     }
 
     /**
