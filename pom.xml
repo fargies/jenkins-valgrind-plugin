@@ -56,8 +56,8 @@
   </dependencies>
 
   <scm>
-    <connection>scm:git:ssh://git@gitorious.org:fargies-misc-tools/jenkins-valgrind-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@gitorious.org:fargies-misc-tools/jenkins-valgrind-plugin.git</developerConnection>
+    <connection>scm:git:git://gitorious.org/fargies-misc-tools/jenkins-valgrind-plugin.git</connection>
+    <developerConnection>scm:git:git://gitorious.org/fargies-misc-tools/jenkins-valgrind-plugin.git</developerConnection>
     <url>https://gitorious.org/fargies-misc-tools/jenkins-valgrind-plugin</url>
   </scm>
 
