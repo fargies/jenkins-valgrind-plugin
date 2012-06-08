@@ -12,9 +12,18 @@
   <packaging>hpi</packaging>
   <name>Valgrind analysis Plug-in</name>
   <version>4.26-SNAPSHOT</version>
-  <url>http://wiki.jenkins-ci.org/x/XoAs</url>
+  <url></url>
   <description>This plug-in reads Valgrind analysis from a log file and
   generates a trend report.</description>
+
+  <developers>
+    <developer>
+      <id>fargie_s</id>
+      <name>Fargier Sylvain</name>
+      <email>fargier.sylvain@free.fr</email>
+    </developer>
+  </developers>
+
 
   <licenses>
     <license>
@@ -47,9 +56,9 @@
   </dependencies>
 
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <connection>scm:git:ssh://git@gitorious.org:fargies-misc-tools/jenkins-valgrind-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@gitorious.org:fargies-misc-tools/jenkins-valgrind-plugin.git</developerConnection>
+    <url>https://gitorious.org/fargies-misc-tools/jenkins-valgrind-plugin</url>
   </scm>
 
   <repositories>
