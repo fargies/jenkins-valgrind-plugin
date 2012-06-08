@@ -11,7 +11,7 @@
   <artifactId>valgrind</artifactId>
   <packaging>hpi</packaging>
   <name>Valgrind analysis Plug-in</name>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <url />
   <description>This plug-in reads Valgrind analysis from a log file and
   generates a trend report.</description>
