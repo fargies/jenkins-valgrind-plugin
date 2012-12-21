@@ -4,9 +4,9 @@ import hudson.Plugin;
 import hudson.plugins.analysis.views.DetailFactory;
 
 /**
- * Registers the task scanner plug-in publisher.
+ * Registers the valgrind memory-leaks publisher.
  *
- * @author Ulli Hafner
+ * @author Sylvain Fargier
  */
 public class LeaksPlugin extends Plugin {
     /** {@inheritDoc} */

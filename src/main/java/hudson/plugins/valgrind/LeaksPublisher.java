@@ -150,6 +150,7 @@ public class LeaksPublisher extends HealthAwarePublisher {
 
         LeakParser parser = new LeakParser();
         for (int i = 0; i < reports.length; ++i) {
+            logger.log(String.format("Parsing %s.", reports[i]));
             parser.parse(reports[i].read(), project, root, getDefaultEncoding());
         }
 

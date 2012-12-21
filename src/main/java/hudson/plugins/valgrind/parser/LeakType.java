@@ -37,6 +37,7 @@ public enum LeakType {
             case Leak_IndirectlyLost:
                 return Priority.NORMAL;
 
+            case UninitValue:
             case Leak_DefinitelyLost:
             case ClientCheck:
             case SyscallParam:
